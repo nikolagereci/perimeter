@@ -18,6 +18,7 @@ func traverse(coordinates []Point, startEdge Edge) ([]Edge, error) {
 	var e Edge
 	for !peripheralEdgeSet[e] {
 		for coordinate, squareIndex := range squareMapByCoordinate {
+			//potential neighbouring squares
 			down := Point{coordinate.x, coordinate.y - 1}
 			right := Point{coordinate.x + 1, coordinate.y}
 			up := Point{coordinate.x, coordinate.y + 1}
@@ -44,8 +45,10 @@ func traverse(coordinates []Point, startEdge Edge) ([]Edge, error) {
 		for i := range nextSquaresByPriority {
 			if index, found := squareMapByCoordinate[nextSquaresByPriority[i]]; found {
 				edgeCandidate := Edge{index, associatedEdgeIndexes[i]}
+				//check if edge candidate is a peripheral edge
 				if peripheralEdgeSet[edgeCandidate] {
 					if edgeCandidate == startEdge {
+						//end traversal if you loop back to start
 						return traversal, nil
 					} else {
 						traversal = append(traversal, edgeCandidate)
@@ -58,6 +61,8 @@ func traverse(coordinates []Point, startEdge Edge) ([]Edge, error) {
 	}
 }
 
+// getNextPossibleByPriority
+// constructs possible square and edge options, returned in descending priority
 func getNextPossibleByPriority(self Point, edgeIndex int) ([]Point, []int) {
 	down := Point{self.x, self.y - 1}
 	downRight := Point{self.x + 1, self.y - 1}
