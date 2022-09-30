@@ -5,8 +5,9 @@ import (
 	"fmt"
 )
 
+//TraverseBruteForce
 //Clunky hashmap approach
-func traverseBruteForce(coordinates []Point, startEdge Edge) ([]Edge, error) {
+func TraverseBruteForce(coordinates []Point, startEdge Edge) ([]Edge, error) {
 	//construct square search hashmap
 	squareMapByCoordinate := make(map[Point]int)
 	squareMapByIndex := make(map[int]Point)
@@ -37,7 +38,7 @@ func traverseBruteForce(coordinates []Point, startEdge Edge) ([]Edge, error) {
 	if !peripheralEdgeSet[startEdge] {
 		return []Edge{}, errors.New(fmt.Sprintf("edge %+v invalid (non existant or non perimeter)", startEdge))
 	}
-	//traverseBruteForce
+	//traverse
 	traversalPath := []Edge{startEdge}
 	currentEdge := startEdge
 	for {
@@ -86,8 +87,10 @@ func getNextPossibleByPriority(self Point, edgeIndex int) ([]Point, []int) {
 	return []Point{}, []int{}
 }
 
-//More elegant, but not fully functionaly matrix approach
-func traverseMatrix(coordinates []Point, startEdge Edge) ([]Edge, error) {
+//TraverseMatrix
+//More elegant, but not fully functional matrix approach
+//Works only for square shaped areas
+func TraverseMatrix(coordinates []Point, startEdge Edge) ([]Edge, error) {
 	//construct square search hashmap
 	squareSetByCoordinate := make(map[Point]bool)
 	for i := range coordinates {
@@ -95,6 +98,7 @@ func traverseMatrix(coordinates []Point, startEdge Edge) ([]Edge, error) {
 		squareSetByCoordinate[p] = true
 	}
 	//construct edge matrix
+	//TODO matrix probably needs reordering in case startEdge != {0,0}
 	var edgeMatrix [][4]bool
 	for _, coordinate := range coordinates {
 		row := [4]bool{}
@@ -105,22 +109,23 @@ func traverseMatrix(coordinates []Point, startEdge Edge) ([]Edge, error) {
 		left := Point{coordinate.x - 1, coordinate.y}
 		for i, option := range []Point{down, right, up, left} {
 			//an edge is peripheral if it has nothing next to it
-			if squareSetByCoordinate[option] {
+			if !squareSetByCoordinate[option] {
 				row[i] = true
 			}
 		}
 		edgeMatrix = append(edgeMatrix, row)
 	}
 
-	x, y := startEdge.squareIndex, startEdge.edge
+	var x, y int
 	length := len(edgeMatrix)
 
 	//validate start edge
-	if x >= length || y > 3 || !edgeMatrix[x][y] {
+	if x >= length || y > 3 || !edgeMatrix[startEdge.squareIndex][startEdge.edge] {
 		return []Edge{}, errors.New(fmt.Sprintf("edge %+v invalid (non existant or non perimeter)", startEdge))
 	}
 
-	//traverseBruteForce matrix
+	//traverse matrix
+	//TODO traversal needs work to support irregular shapes
 	var traversalPath []Edge
 	var reverse bool
 	for x >= 0 {

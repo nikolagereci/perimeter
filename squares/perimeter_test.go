@@ -259,7 +259,7 @@ func Test_traverse(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := traverseBruteForce(tt.args.fields, tt.args.startEdge)
+			got, err := TraverseBruteForce(tt.args.fields, tt.args.startEdge)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("traverseBruteForce() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -525,13 +525,13 @@ func Test_traverseMatrix(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := traverseMatrix(tt.args.fields, tt.args.startEdge)
+			got, err := TraverseMatrix(tt.args.fields, tt.args.startEdge)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("traverseBruteForce() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("traverseMatrix() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("traverseBruteForce() got = %v, want %v", got, tt.want)
+				t.Errorf("traverseMatrix() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
