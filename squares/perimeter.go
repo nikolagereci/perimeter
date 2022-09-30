@@ -84,3 +84,68 @@ func getNextPossibleByPriority(self Point, edgeIndex int) ([]Point, []int) {
 	}
 	return []Point{}, []int{}
 }
+
+func traverseMatrix(coordinates []Point, startEdge Edge) ([]Edge, error) {
+	//construct square search hashmap
+	squareMapByCoordinate := make(map[Point]int)
+	for i := range coordinates {
+		p := Point{coordinates[i].x, coordinates[i].y}
+		squareMapByCoordinate[p] = i
+	}
+	//construct edge matrix
+	var edgeMatrix [][4]bool
+	for _, coordinate := range coordinates {
+		row := [4]bool{}
+		//potential neighbouring squares
+		down := Point{coordinate.x, coordinate.y - 1}
+		right := Point{coordinate.x + 1, coordinate.y}
+		up := Point{coordinate.x, coordinate.y + 1}
+		left := Point{coordinate.x - 1, coordinate.y}
+		for i, option := range []Point{down, right, up, left} {
+			//an edge is peripheral if it has nothing next to it
+			if _, found := squareMapByCoordinate[option]; !found {
+				row[i] = true
+			}
+		}
+		edgeMatrix = append(edgeMatrix, row)
+	}
+	//shift matrix by start edge
+
+	x, y := startEdge.squareIndex, startEdge.edge
+	length := len(edgeMatrix)
+
+	//validate start edge
+	if x >= length || y > 3 || !edgeMatrix[x][y] {
+		return []Edge{}, errors.New(fmt.Sprintf("edge %+v invalid (non existant or non perimeter)", startEdge))
+	}
+
+	//traverse matrix
+	var traversalPath []Edge
+	var reverse bool
+	for x >= 0 {
+		if x == length {
+			reverse = true
+			x = x - 2
+			continue
+		}
+		if edgeMatrix[x][y] {
+			traversalPath = append(traversalPath, Edge{squareIndex: x, edge: y})
+			if y < 3 && edgeMatrix[x][y+1] {
+				y++
+			} else {
+				if !reverse {
+					x++
+				} else {
+					x--
+				}
+			}
+		} else {
+			if !reverse {
+				x++
+			} else {
+				x--
+			}
+		}
+	}
+	return traversalPath, nil
+}
