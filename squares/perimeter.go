@@ -5,7 +5,8 @@ import (
 	"fmt"
 )
 
-func traverse(coordinates []Point, startEdge Edge) ([]Edge, error) {
+//Clunky hashmap approach
+func traverseBruteForce(coordinates []Point, startEdge Edge) ([]Edge, error) {
 	//construct square search hashmap
 	squareMapByCoordinate := make(map[Point]int)
 	squareMapByIndex := make(map[int]Point)
@@ -36,7 +37,7 @@ func traverse(coordinates []Point, startEdge Edge) ([]Edge, error) {
 	if !peripheralEdgeSet[startEdge] {
 		return []Edge{}, errors.New(fmt.Sprintf("edge %+v invalid (non existant or non perimeter)", startEdge))
 	}
-	//traverse
+	//traverseBruteForce
 	traversalPath := []Edge{startEdge}
 	currentEdge := startEdge
 	for {
@@ -85,12 +86,13 @@ func getNextPossibleByPriority(self Point, edgeIndex int) ([]Point, []int) {
 	return []Point{}, []int{}
 }
 
+//More elegant, but not fully functionaly matrix approach
 func traverseMatrix(coordinates []Point, startEdge Edge) ([]Edge, error) {
 	//construct square search hashmap
-	squareMapByCoordinate := make(map[Point]int)
+	squareSetByCoordinate := make(map[Point]bool)
 	for i := range coordinates {
 		p := Point{coordinates[i].x, coordinates[i].y}
-		squareMapByCoordinate[p] = i
+		squareSetByCoordinate[p] = true
 	}
 	//construct edge matrix
 	var edgeMatrix [][4]bool
@@ -103,13 +105,12 @@ func traverseMatrix(coordinates []Point, startEdge Edge) ([]Edge, error) {
 		left := Point{coordinate.x - 1, coordinate.y}
 		for i, option := range []Point{down, right, up, left} {
 			//an edge is peripheral if it has nothing next to it
-			if _, found := squareMapByCoordinate[option]; !found {
+			if squareSetByCoordinate[option] {
 				row[i] = true
 			}
 		}
 		edgeMatrix = append(edgeMatrix, row)
 	}
-	//shift matrix by start edge
 
 	x, y := startEdge.squareIndex, startEdge.edge
 	length := len(edgeMatrix)
@@ -119,7 +120,7 @@ func traverseMatrix(coordinates []Point, startEdge Edge) ([]Edge, error) {
 		return []Edge{}, errors.New(fmt.Sprintf("edge %+v invalid (non existant or non perimeter)", startEdge))
 	}
 
-	//traverse matrix
+	//traverseBruteForce matrix
 	var traversalPath []Edge
 	var reverse bool
 	for x >= 0 {
