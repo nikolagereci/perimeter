@@ -37,11 +37,11 @@ func traverse(coordinates []Point, startEdge Edge) ([]Edge, error) {
 		return []Edge{}, errors.New(fmt.Sprintf("edge %+v invalid (non existant or non perimeter)", startEdge))
 	}
 	//traverse
-	traversal := []Edge{startEdge}
-	nextEdge := startEdge
+	traversalPath := []Edge{startEdge}
+	currentEdge := startEdge
 	for {
-		nextEdgeSquareCoordinate := squareMapByIndex[nextEdge.squareIndex]
-		nextSquaresByPriority, associatedEdgeIndexes := getNextPossibleByPriority(nextEdgeSquareCoordinate, nextEdge.edge)
+		nextEdgeSquareCoordinate := squareMapByIndex[currentEdge.squareIndex]
+		nextSquaresByPriority, associatedEdgeIndexes := getNextPossibleByPriority(nextEdgeSquareCoordinate, currentEdge.edge)
 		for i := range nextSquaresByPriority {
 			if index, found := squareMapByCoordinate[nextSquaresByPriority[i]]; found {
 				edgeCandidate := Edge{index, associatedEdgeIndexes[i]}
@@ -49,10 +49,10 @@ func traverse(coordinates []Point, startEdge Edge) ([]Edge, error) {
 				if peripheralEdgeSet[edgeCandidate] {
 					if edgeCandidate == startEdge {
 						//end traversal if you loop back to start
-						return traversal, nil
+						return traversalPath, nil
 					} else {
-						traversal = append(traversal, edgeCandidate)
-						nextEdge = edgeCandidate
+						traversalPath = append(traversalPath, edgeCandidate)
+						currentEdge = edgeCandidate
 						break
 					}
 				}
@@ -62,7 +62,7 @@ func traverse(coordinates []Point, startEdge Edge) ([]Edge, error) {
 }
 
 // getNextPossibleByPriority
-// constructs possible square and edge options, returned in descending priority
+// constructs possible square and edge options for an edge, returned in descending priority
 func getNextPossibleByPriority(self Point, edgeIndex int) ([]Point, []int) {
 	down := Point{self.x, self.y - 1}
 	downRight := Point{self.x + 1, self.y - 1}
